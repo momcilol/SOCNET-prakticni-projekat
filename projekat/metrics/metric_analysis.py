@@ -56,25 +56,6 @@ def print_node_metrics_results(results, metric, has_name=False):
 
 
 
-# Draw a graph
-
-def draw_centrality_results(results: dict, metric, has_name=False):
-
-    plt.style.use('_mpl-gallery')
-    sizes = [x*60 + 20 for x in list(results.values)]
-    colors = [80 - x*60 for x in list(results.values)]
-    fig, ax = plt.subplots()
-
-    x = results.keys.name if has_name else results.keys
-    y = results.values
-    
-    ax.scatter(x, y, s=sizes, c=colors, vmin=0, vmax=100)
-    plt.xlabel('Nodes')
-    plt.ylabel('Scores')
-    plt.title(metric)
-    plt.show()
-
-
 def get_hits_results(graph: nx.DiGraph):
     return nx.hits(graph)
 
@@ -139,7 +120,6 @@ def get_radius(graph: nx.Graph):
 
 # K-core decomposition
 
-
 def get_k_core_decomposition(graph: nx.Graph, sign=None):
     # sign je ostavljen da bi se kasnije implementiralo za znake edge-a
     max_degree = max([v[1] for v in list(graph.degree())])
@@ -198,26 +178,7 @@ def get_degree_information(graph: nx.Graph):
     return nodes_per_degree, degree_distribution, complementary_cumulative_distribution, average, density
         
 
-degree_info_metric = [
-    "Nodes per degree",
-    "Degree distribution",
-    "Complementary cumulative degree distribution"
-]
-
-    
-def draw_degree_info(results, metric):
-    plt.style.use('_mpl-gallery')
-    fig, ax = plt.subplots()
-
-    ax.bar(results, linewidth=2.0)
-    plt.xlabel('Nodes')
-    plt.ylabel('Scores')
-    plt.title(metric)
-    plt.show()
-
-
 # Network assortativity
-
     
 def get_pearson_coefficient(graph: nx.Graph):
     return nx.degree_pearson_correlation_coefficient(graph)
@@ -228,16 +189,3 @@ def get_spearman_coefficient(graph: nx.Graph):
     x, y = zip(*xy)
     return spearmanr(x, y)[0]
 
-
-def draw_assortativity(graph: nx.Graph):
-    xy = nx.node_degree_xy
-    x, y = zip(*xy)
-
-    plt.style.use('_mpl-gallery')
-    fig, ax = plt.subplots()
-    
-    ax.scatter(x, y)
-    plt.title("Assortativity")
-    plt.xlabel('Nodes')
-    plt.ylabel('Scores')
-    plt.show()

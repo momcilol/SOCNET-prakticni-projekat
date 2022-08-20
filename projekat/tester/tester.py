@@ -2,6 +2,7 @@ from math import log
 from unittest import result
 import networkx as nx
 import metrics.metric_analysis as ma
+import visualiser.metrics_visualiser as mv
 import cluster as cl
 from cluster.signed_clusterable_network import SignedNetworkComponentClusterer
 
@@ -29,14 +30,14 @@ class Tester:
         coalitions = self._sncc.get_coalitions()
         non_coalitions = self._sncc.get_non_coalitions()
 
-        trivial = 0
+        trimval = 0
 
         for coalition in coalitions:
             triv = coalition.number_of_nodes() == 1
             if triv:
-                trivial += 1
+                trimval += 1
             
-            print(f"{coalition.name}: {'trivial ' if triv else ''}coalition")
+            print(f"{coalition.name}: {'trimval ' if triv else ''}coalition")
             self._print_nodes_and_edges(coalition)
             
 
@@ -48,14 +49,13 @@ class Tester:
             self._print_negative_edges()
 
 
-        print(f"Number of trivial coalitions: {trivial}", end='\n\n')
+        print(f"Number of trimval coalitions: {trimval}", end='\n\n')
         
         print("Inter-component edges: ")
         for edge in cluster_graph.edges():
             print(f"{edge[0].name} ({self._sncc._transform(edge)}) {edge[1].name}", end=", ")
         print()
-
-         
+        
 
     
     def _print_negative_edges(self, graph: nx.Graph):
@@ -69,16 +69,16 @@ class Tester:
         details = f": {len(self._sncc.get_non_coalitions())} clusters with {len(self._sncc.get_negative_edges())} problematic edges"
         print(f"Network is {clust}culsterable {details if clusterable else ''}") 
         num_coalitions = len(self._sncc.get_coalitions())
-        num_components = len(self._sncc.get_components())
+        num_components = len(self._sncc.get_components()) 
         num_trivial = len([x for x in self._sncc.get_coalitions() if x.number_of_nodes() == 1])
-        print(f"{num_coalitions} out of {num_components} clusters are coalitions, where {num_trivial} are trivial", end="\n\n")
+        print(f"{num_coalitions} out of {num_components} clusters are coalitions, where {num_trivial} are trimval", end="\n\n")
 
     
     def show_degree_information(self, graph: nx.Graph):
         nodes_per_degree, degree_distribution, complementary_cumulative_distribution, average_degree, network_density = ma.get_degree_information(graph)
-        ma.draw_degree_info(nodes_per_degree, ma.degree_info_metric[0])
-        ma.draw_degree_info(degree_distribution, ma.degree_info_metric[1])
-        ma.draw_degree_info(complementary_cumulative_distribution, ma.degree_info_metric[2])
+        mv.draw_degree_info(nodes_per_degree, mv.degree_info_metric[0])
+        mv.draw_degree_info(degree_distribution, mv.degree_info_metric[1])
+        mv.draw_degree_info(complementary_cumulative_distribution, mv.degree_info_metric[2])
         print(f"Average degree: {average_degree : .4f}")
         dense = "dense" if network_density > 0.7 else "sparse"
         print(f"Network density: {network_density : .4f} (network is {dense})", end="\n\n")
@@ -105,8 +105,8 @@ class Tester:
         ma.print_hits_results(hits)    
     
 
-    def print_assortativity(self, graph: nx.Graph):
-        ma.draw_assortativity(graph)
+    def print_assortatimvty(self, graph: nx.Graph):
+        ma.draw_assortatimvty(graph)
         print(f"Pearson coefficient: {ma.get_pearson_coefficient(graph)}")
         print(f"Spearman coefficient: {ma.get_spearman_coefficient(graph)}")
 
