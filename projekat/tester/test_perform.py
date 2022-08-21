@@ -2,6 +2,7 @@ from math import log
 from unittest import result
 import networkx as nx
 import metrics.metric_analysis as ma
+from projekat.visualiser.graph_visualiser import draw_graph
 import visualiser.metrics_visualiser as mv
 import cluster as cl
 from cluster.signed_clusterable_network import SignedNetworkComponentClusterer
@@ -30,14 +31,14 @@ class Tester:
         coalitions = self._sncc.get_coalitions()
         non_coalitions = self._sncc.get_non_coalitions()
 
-        trimval = 0
+        trivial = 0
 
         for coalition in coalitions:
             triv = coalition.number_of_nodes() == 1
             if triv:
-                trimval += 1
+                trivial += 1
             
-            print(f"{coalition.name}: {'trimval ' if triv else ''}coalition")
+            print(f"{coalition.name}: {'trivial ' if triv else ''}coalition")
             self._print_nodes_and_edges(coalition)
             
 
@@ -49,18 +50,18 @@ class Tester:
             self._print_negative_edges()
 
 
-        print(f"Number of trimval coalitions: {trimval}", end='\n\n')
+        print(f"Number of trivial coalitions: {trivial}", end='\n\n')
         
         print("Inter-component edges: ")
         for edge in cluster_graph.edges():
-            print(f"{edge[0].name} ({self._sncc._transform(edge)}) {edge[1].name}", end=", ")
+            print(f"{edge[0].name} ({self._sncc._transform(cluster_graph, edge)}) {edge[1].name}", end=", ")
         print()
         
 
     
     def _print_negative_edges(self, graph: nx.Graph):
         for edge in self._sncc.get_negative_edges(graph):
-            print(f"{edge[0].name} ({self._sncc._transform(edge)}) {edge[1].name}", end=", ")
+            print(f"{edge[0].name} ({self._sncc._transform(graph, edge)}) {edge[1].name}", end=", ")
 
 
     def check_clusterability(self):
@@ -71,7 +72,7 @@ class Tester:
         num_coalitions = len(self._sncc.get_coalitions())
         num_components = len(self._sncc.get_components()) 
         num_trivial = len([x for x in self._sncc.get_coalitions() if x.number_of_nodes() == 1])
-        print(f"{num_coalitions} out of {num_components} clusters are coalitions, where {num_trivial} are trimval", end="\n\n")
+        print(f"{num_coalitions} out of {num_components} clusters are coalitions, where {num_trivial} are trivial", end="\n\n")
 
     
     def show_degree_information(self, graph: nx.Graph):
@@ -105,8 +106,8 @@ class Tester:
         ma.print_hits_results(hits)    
     
 
-    def print_assortatimvty(self, graph: nx.Graph):
-        ma.draw_assortatimvty(graph)
+    def print_assortativity(self, graph: nx.Graph):
+        mv.draw_assortativity(graph)
         print(f"Pearson coefficient: {ma.get_pearson_coefficient(graph)}")
         print(f"Spearman coefficient: {ma.get_spearman_coefficient(graph)}")
 
@@ -136,6 +137,8 @@ class Tester:
         print(f"Diameter: {ma.get_diameter(graph)}")
         print(f"Radius: {ma.get_radius(graph)}")
     
-
+    
+    def draw_network(self, graph: nx.Graph, layout="spring"):
+        draw_graph(graph, self._sncc._transform, layout_key=layout)
     
     

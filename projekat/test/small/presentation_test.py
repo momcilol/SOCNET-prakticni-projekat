@@ -1,5 +1,8 @@
 import networkx as nx
 
+import projekat.tester.test_perform as te
+
+
 def main():
     graph = nx.Graph(name="Presentation")
     graph.add_edges_from([
@@ -26,10 +29,31 @@ def main():
         (14, 15, {'sign': '-'})
     ]) 
 
-    
 
+    tester = te.Tester(graph, transform= lambda G, edge : G[edge[0]][edge[1]]['sign'])
+    cluster_network = tester._sncc.get_cluster_graph()
 
-  
+    # Test results
+
+    tester.print_network()
+    tester.check_clusterability()
+    tester.show_degree_information(graph)
+    tester.print_centralities(graph, True)
+    tester.print_assortativity(graph)
+    tester.print_k_core_decomposition(graph)
+    tester.print_small_world_metrics(graph)
+    tester.draw_network(graph)
+
+    print("Cluster network statistics:")
+
+    tester.show_degree_information(cluster_network)
+    tester.print_centralities(cluster_network)
+    tester.print_assortativity(cluster_network)
+    tester.print_k_core_decomposition(cluster_network)
+    tester.print_small_world_metrics(cluster_network)
+    tester.draw_network(cluster_network) 
+
+ 
 
 if __name__=="__main__":
     main()

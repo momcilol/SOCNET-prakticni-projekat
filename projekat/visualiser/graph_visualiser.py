@@ -16,18 +16,18 @@ layout = {
 }
 
 
-def draw_graph(G: nx.Graph, layout_key, transform):
+def draw_graph(G: nx.Graph, transform, layout_key="spring"):
     pos = layout[layout_key](G)
     nx.draw_networkx(G, pos, node_color=range(10, 24), cmap=plt.cm.Blues)
     nx.draw_networkx_labels(G, pos)
 
-    positive = [edge for edge in G.edges() if transform(edge) == EdgeSign.POSITVE]
+    positive = [edge for edge in G.edges() if transform(G, edge) == EdgeSign.POSITVE]
     nx.draw_networkx_edges(G, pos, edgelist=positive, edge_color='green')
 
-    negative = [edge for edge in G.edges() if transform(edge) == EdgeSign.NEGATIVE]
+    negative = [edge for edge in G.edges() if transform(G, edge) == EdgeSign.NEGATIVE]
     nx.draw_networkx_edges(G, pos, edgelist=negative, edge_color='red')
     
-    edge_labels = {edge: transform(edge) for edge in G.edges()}
+    edge_labels = {edge: transform(G, edge) for edge in G.edges()}
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
     plt.show()
