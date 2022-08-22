@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 
 def draw_centrality_results(results: dict, metric, has_name=False):
@@ -51,4 +52,18 @@ def draw_assortativity(graph: nx.Graph, rang=False):
     plt.xlabel('Node degrees')
     plt.ylabel('Node degrees')
     plt.subplots_adjust(left=0.1, bottom=0.12, top=0.9, right=0.95)
+    plt.show()
+
+
+def draw_matrix(graph: nx.Graph, a: np.array, title: str, has_name=False):
+    nodes = []
+    if has_name:
+        nodes = [node.name for node in graph.nodes()]
+    else:
+        nodes = list(graph)
+
+    plt.matshow(a)
+    plt.title(title)
+    plt.xticks(range(graph.number_of_nodes()), nodes, rotation=45)
+    plt.yticks(range(graph.number_of_nodes()), nodes)
     plt.show()

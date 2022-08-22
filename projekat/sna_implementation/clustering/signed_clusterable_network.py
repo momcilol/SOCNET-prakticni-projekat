@@ -85,7 +85,7 @@ class SignedNetworkComponentClusterer:
         
         for i in range(0, len(nodes) - 1):
             for j in range(i + 1, len(nodes)):
-                if self._graph.has_edge(nodes[i], nodes[j]) and self._transform(component, (nodes[i], nodes[j])) == es.EdgeSign.NEGATIVE:
+                if self._graph.has_edge(nodes[i], nodes[j]) and self._transform(self._graph, (nodes[i], nodes[j])) == es.EdgeSign.NEGATIVE.value:
                     self.__negative_edges[component].append((nodes[i], nodes[j], self._graph[nodes[i]][nodes[j]])) 
 
 
@@ -111,7 +111,8 @@ class SignedNetworkComponentClusterer:
             if component1 == component2 or self.__cluster_graph.has_edge(component1, component2):
                 continue
 
-            self.__cluster_graph.add_edge(component1, component2, sign='-')
+            self.__cluster_graph.add_edges_from([(component1, component2, self._graph[node1][node2])])
+            # self.__cluster_graph.add_edge(component1, component2, sign='-')
 
     # ========= Kraj analize mreze ===========
 
@@ -142,7 +143,7 @@ class SignedNetworkComponentClusterer:
 
 
     def get_problematic_edges(self, component: nx.Graph):
-        return self.__negative_edges[component: nx.Graph]
+        return self.__negative_edges[component]
 
 
 

@@ -1,4 +1,5 @@
 from math import degrees
+import numpy as np
 from platform import node
 from queue import Empty
 import networkx as nx
@@ -37,6 +38,24 @@ def get_page_rank(graph: nx.DiGraph):
 def get_clustering_coefficients(graph):
     return nx.clustering(graph)
 
+
+def get_sim_rank_coefficients(graph):
+    sim = nx.simrank_similarity(graph)
+    return np.array([[sim[u][v] for v in graph] for u in graph])
+
+
+def get_adamic_adar_coefficients(graph: nx.Graph):
+    aait = nx.adamic_adar_index(graph)
+    num = graph.number_of_nodes()
+    aam = [[0 for j in range(num)] for i in range(num)]
+    nodes = list(graph.nodes())
+    for u, v, p in aait:
+        i = nodes.index(u)
+        j = nodes.index(v)
+        aam[i][j] = p
+        aam[j][i] = p
+    
+    return np.array(aam)
 
 # Console print
 
@@ -135,6 +154,11 @@ def get_k_core_decomposition(graph: nx.Graph, sign=None):
         d[v] = k
         D[k].add(v)
 
+    # print(f"Start K core")
+    # print(f"Start d: {d}")
+    # print(f"Start D: {D}")
+
+    # print("Calculating...")
     for k in range(max_degree + 1):
         while len(D[k]) != 0:
             # izbacujemo jedan cvor iz tekuceg skupa (shell-a)
@@ -144,10 +168,17 @@ def get_k_core_decomposition(graph: nx.Graph, sign=None):
             # skupove sa indexom za 1 manji od dosadasnjeg
             for v in graph.neighbors(x):
                 if d[v] > k:
-                    D[d[v]].pop()
+                    D[d[v]].remove(v)
                     D[d[v]-1].add(v)
                     d[v] = d[v] - 1
+            # print(x)
+            # print(f"d: {d}")
+            # print(f"D: {D}")
+            # print(f"S: {S}")
+
     
+    # print(f"K core preview: {S}")
+
     return S
 
 

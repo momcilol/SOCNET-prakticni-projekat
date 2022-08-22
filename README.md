@@ -1,1 +1,3 @@
-# SOCNET-prakticni-projekat
+# Praktični projekat iz predmeta Socijalne mreže
+
+

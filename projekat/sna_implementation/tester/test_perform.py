@@ -1,4 +1,5 @@
 from math import log
+import numpy as np
 from unittest import result
 import networkx as nx
 import sna_implementation.metrics.metric_analysis as ma
@@ -50,21 +51,21 @@ class Tester:
             print(f"{cluster.name} cluster")
             self._print_nodes_and_edges(cluster)
             print(f"Problematic edges: {len(self._sncc.get_problematic_edges(cluster))} edges")
-            self._print_negative_edges()
+            self._print_problematic_edges(cluster)
 
-
+        print()
         print(f"Number of trivial coalitions: {trivial}", end='\n\n')
         
         print("Inter-component edges: ")
         for edge in cluster_graph.edges():
-            print(f"{edge[0].name} ({self._sncc._transform(cluster_graph, edge)}) {edge[1].name}", end=", ")
+            print(f"{edge[0].name} (-) {edge[1].name}", end=", ")
         print()
         
 
     
-    def _print_negative_edges(self, graph: nx.Graph):
-        for edge in self._sncc.get_negative_edges(graph):
-            print(f"{edge[0].name} ({self._sncc._transform(graph, edge)}) {edge[1].name}", end=", ")
+    def _print_problematic_edges(self, graph: nx.Graph):
+        for edge in self._sncc.get_problematic_edges(graph):
+            print(f"{edge[0]} ({self._sncc._transform(self._sncc._graph, edge)}) {edge[1]}", end=", ")
 
 
     def check_clusterability(self):
@@ -149,5 +150,14 @@ class Tester:
     
     def draw_network(self, graph: nx.Graph, layout="spring", name=False):
         draw_graph(graph, self._sncc._transform, layout_key=layout, has_name=name)
+
+
+    def print_similarity_matrix(self, graph: nx.Graph, name=False):
+        sim = ma.get_sim_rank_coefficients(graph)
+        mv.draw_matrix(graph, sim, "Sim Rank", name)
+        aa = ma.get_adamic_adar_coefficients(graph)
+        mv.draw_matrix(graph, aa, "Adamic Adar", name)
+
+        
     
     

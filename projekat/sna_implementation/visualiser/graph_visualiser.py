@@ -20,14 +20,17 @@ layout = {
 
 def draw_graph(G: nx.Graph, transform, layout_key="spring", has_name=False):
     pos = layout[layout_key](G)
-    node_color = [log(float(G.degree(node) + 1), e) + 5 for node in G.nodes()]
+    max_deg = max([v for k, v in list(G.degree())]) + 1
+    node_color = [1-log(float(0.6*max_deg + 0.6*(G.degree(node)+1)), 2*max_deg) for node in G.nodes()]
+    node_size = [(2-x)*170 for x in node_color]
+    # print(node_color)
     node_lables = {}
     if has_name:
         node_lables = {n: n.name for n in G.nodes()}
     else:
         node_lables = {n: n for n in G}
 
-    nx.draw_networkx(G, pos, node_color=node_color, cmap=plt.cm.Blues, labels=node_lables)
+    nx.draw_networkx(G, pos,node_size=node_size , node_color=node_color, cmap=plt.get_cmap("YlOrBr"), labels=node_lables, vmin=0, vmax=1)
 
     
     # nx.draw_networkx_labels(G, pos, labels=node_lables)

@@ -50,6 +50,8 @@ def main():
     # input(">>next>>")
     # tester.print_small_world_metrics(graph)
     # input(">>next>>")
+    tester.print_similarity_matrix(graph)
+    input(">>next>>")
     # tester.draw_network(graph)
     # input(">>next>>")
 
@@ -65,8 +67,10 @@ def main():
     # input(">>next>>")
     # tester.print_small_world_metrics(cluster_network)
     # input(">>next>>")
-    tester.draw_network(cluster_network, name=True) 
-    input(">>Thats it>>")
+    tester.print_similarity_matrix(cluster_network, True)
+    input(">>next>>")
+    # tester.draw_network(cluster_network, name=True) 
+    # input(">>Thats it>>")
 
 
 if __name__=="__main__":
