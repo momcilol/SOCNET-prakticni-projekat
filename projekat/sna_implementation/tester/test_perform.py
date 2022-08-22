@@ -1,22 +1,25 @@
 from math import log
 from unittest import result
 import networkx as nx
-import metrics.metric_analysis as ma
-from projekat.visualiser.graph_visualiser import draw_graph
-import visualiser.metrics_visualiser as mv
-import cluster as cl
-from cluster.signed_clusterable_network import SignedNetworkComponentClusterer
+import sna_implementation.metrics.metric_analysis as ma
+from sna_implementation.visualiser.graph_visualiser import draw_graph
+import sna_implementation.visualiser.metrics_visualiser as mv
+from sna_implementation.clustering.signed_clusterable_network import SignedNetworkComponentClusterer
 
 class Tester:
 
     def __init__(self, graph: nx.Graph, transform):
         self._sncc = SignedNetworkComponentClusterer(graph, transform)
+        print("Analisys started")
+        self._sncc.analyze()
+        print("Analisys finished")
+
 
 
     def print_network(self):
         print(f"Input network: {self._sncc._graph}")
         self._print_nodes_and_edges(self._sncc._graph)
-        print(f"Cluster network: {self._sncc.get_cluster_graph().number_of_nodes} clusters")
+        print(f"Cluster network: {self._sncc.get_cluster_graph().number_of_nodes()} clusters")
         self._print_cluster_network()
 
 
@@ -65,6 +68,7 @@ class Tester:
 
 
     def check_clusterability(self):
+        print("CLUSTERABILITY")
         clusterable = len(self._sncc.get_non_coalitions()) > 0
         clust = "not " if clusterable else ""
         details = f": {len(self._sncc.get_non_coalitions())} clusters with {len(self._sncc.get_negative_edges())} problematic edges"
@@ -76,10 +80,11 @@ class Tester:
 
     
     def show_degree_information(self, graph: nx.Graph):
+        print("DEGREE INFO")
         nodes_per_degree, degree_distribution, complementary_cumulative_distribution, average_degree, network_density = ma.get_degree_information(graph)
-        mv.draw_degree_info(nodes_per_degree, mv.degree_info_metric[0])
-        mv.draw_degree_info(degree_distribution, mv.degree_info_metric[1])
-        mv.draw_degree_info(complementary_cumulative_distribution, mv.degree_info_metric[2])
+        mv.draw_degree_info(nodes_per_degree, "ND")
+        mv.draw_degree_info(degree_distribution, "DD")
+        mv.draw_degree_info(complementary_cumulative_distribution, "CC")
         print(f"Average degree: {average_degree : .4f}")
         dense = "dense" if network_density > 0.7 else "sparse"
         print(f"Network density: {network_density : .4f} (network is {dense})", end="\n\n")
@@ -95,7 +100,7 @@ class Tester:
         
         for i in range(len(metrics_results)):
             ma.print_node_metrics_results(metrics_results[i], ma.node_metrics[i], has_name)
-        print(f"Average clustering coefficinet: {nx.average_clustering(graph)}", end="\n\n")
+        print(f"Average clustering coefficinet: {nx.average_clustering(graph) : .4f}", end="\n\n")
 
 
 
@@ -108,17 +113,21 @@ class Tester:
 
     def print_assortativity(self, graph: nx.Graph):
         mv.draw_assortativity(graph)
-        print(f"Pearson coefficient: {ma.get_pearson_coefficient(graph)}")
-        print(f"Spearman coefficient: {ma.get_spearman_coefficient(graph)}")
+        print(f"Pearson coefficient: {ma.get_pearson_coefficient(graph) : .4f}")
+        print(f"Spearman coefficient: {ma.get_spearman_coefficient(graph) : .4f}")
 
 
-    def print_k_core_decomposition(self, graph: nx.Graph):
+    def print_k_core_decomposition(self, graph: nx.Graph, has_name=False):
         k_core_decomposition = ma.get_k_core_decomposition(graph)
         print(f"K-core decomposition: {graph.name}")
         max_layer = max(k_core_decomposition.values())
         layers = {i: set() for i in range(max_layer + 1)}
-        for node, value in k_core_decomposition:
-            layers[value].add(node)
+        if has_name:
+            for node, value in k_core_decomposition.items():
+                layers[value].add(node.name)
+        else:
+            for node, value in k_core_decomposition.items():
+                layers[value].add(node)
         
         for i in range(len(layers)):
             print(f"Shell {i}: {layers[i]}")
@@ -131,14 +140,14 @@ class Tester:
         print(f"""
             SMALL WORLD METRICS
         """)
-        print(f"Small world coefficient: {small_world : .4f}, log(number of nodes) = {log(graph.number_of_nodes, 10) : .4f}")
+        print(f"Small world coefficient: {small_world : .4f}, log(number of nodes) = {log(float(graph.number_of_nodes()), 10) : .4f}")
         print(f"Giant component network efficiency: {efficiency : .4f}")
         print(f"Network efficiency: {global_efficiency: .4f}")
         print(f"Diameter: {ma.get_diameter(graph)}")
         print(f"Radius: {ma.get_radius(graph)}")
     
     
-    def draw_network(self, graph: nx.Graph, layout="spring"):
-        draw_graph(graph, self._sncc._transform, layout_key=layout)
+    def draw_network(self, graph: nx.Graph, layout="spring", name=False):
+        draw_graph(graph, self._sncc._transform, layout_key=layout, has_name=name)
     
     

@@ -4,16 +4,16 @@ from queue import Empty
 import networkx as nx
 import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
-import cluster.signed_clusterable_network as cl
-from projekat.cluster.edge_sign import EdgeSign
+import sna_implementation.clustering.signed_clusterable_network as cl
+from sna_implementation.clustering.edge_sign import EdgeSign
 
 
 # Node metrics
 
 node_metrics = [
-    "Betweeness centralilty", 
-    "Closeness centralilty", 
-    "EigenVector centralilty",
+    "Betweeness centrality", 
+    "Closeness centrality", 
+    "EigenVector centrality",
     "Clustering coefficient"
 ]
 
@@ -42,16 +42,16 @@ def get_clustering_coefficients(graph):
 
 def print_node_metrics_results(results, metric, has_name=False):
     print(f"""
-        {metric.upper()}
+       {metric.upper()}
 
         NODES  |  SCORES 
     """)
     if has_name:
         for node, score in results.items():
-            print(f"{node.name : >10} | {score : 12.4f}")
+            print(f"{node.name : >13}  | {score : .4f}")
     else:
         for node, score in results.items():
-            print(f"{node : >10} | {score : 12.4f}")
+            print(f"{node : >13}  | {score : .4f}")
     print()
 
 
@@ -123,19 +123,19 @@ def get_radius(graph: nx.Graph):
 def get_k_core_decomposition(graph: nx.Graph, sign=None):
     # sign je ostavljen da bi se kasnije implementiralo za znake edge-a
     max_degree = max([v[1] for v in list(graph.degree())])
-    d = [0 for n in range(graph.number_of_nodes)]
-    D = [set() for m in range(max_degree)]
+    d = {node: 0 for node in graph.nodes()}
+    D = [set() for m in range(max_degree+1)]
 
     # izlazni niz shell indexa
     S = {}
 
     # postavimo inicijalne stepene
-    for v in graph:
+    for v in graph.nodes():
         k = graph.degree(v)
         d[v] = k
         D[k].add(v)
 
-    for k in range(0, max_degree + 1):
+    for k in range(max_degree + 1):
         while len(D[k]) != 0:
             # izbacujemo jedan cvor iz tekuceg skupa (shell-a)
             x = D[k].pop()
@@ -156,18 +156,18 @@ def get_k_core_decomposition(graph: nx.Graph, sign=None):
 
 def get_degree_information(graph: nx.Graph):
 
-    num_nodes =  graph.number_of_nodes
+    num_nodes =  graph.number_of_nodes()
     nodes_per_degree = nx.degree_histogram(graph)
     max_degree = len(nodes_per_degree) - 1
     max_node_count = max(nodes_per_degree)
 
     degree_distribution = [count / max_node_count for count in nodes_per_degree]
 
-    complementary_cumulative_distribution = []
+    complementary_cumulative_distribution = list(range(max_degree + 1))
     complementary_cumulative_distribution[max_degree] = nodes_per_degree[max_degree]
 
     for i in range(max_degree - 1, -1, -1):
-        complementary_cumulative_distribution[i] = complementary_cumulative_distribution[i+1] + nodes_per_degree[i]
+        complementary_cumulative_distribution[i] = float(complementary_cumulative_distribution[i+1] + nodes_per_degree[i])
         complementary_cumulative_distribution[i+1] /= num_nodes
 
     complementary_cumulative_distribution[0] /= num_nodes  

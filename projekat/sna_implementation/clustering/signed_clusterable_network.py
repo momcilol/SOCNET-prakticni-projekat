@@ -1,5 +1,5 @@
 import networkx as nx
-from edge_sign import EdgeSign
+import sna_implementation.clustering.edge_sign as es
 import itertools
 
 class SignedNetworkComponentClusterer: 
@@ -27,7 +27,7 @@ class SignedNetworkComponentClusterer:
         self.__components.sort(key=self.__sort_key, reverse=True)
 
 
-    def __sort_key(value: nx.Graph):
+    def __sort_key(self, value: nx.Graph):
         return value.number_of_nodes()
 
 
@@ -48,11 +48,14 @@ class SignedNetworkComponentClusterer:
         component.add_node(begin_node)
 
         for curr in node_queue:
-            for neigh in self._graph[curr]:
-                edge = self._graph[curr][neigh]
-
-                if self._transform(edge) == EdgeSign.NEGATIVE:
-                    self.__possible_component_edges.add((curr, neigh, edge))
+            # print(f"Curr: {curr}")
+            for neigh in self._graph.neighbors(curr):
+                # print(f"Neigb: {neigh}")
+                # print(f"Edge: ({curr}, {neigh}) {self._transform(self._graph, (curr, neigh))}")
+                # print(self._transform(self._graph, (curr, neigh)) == es.EdgeSign.NEGATIVE.value)
+                
+                if self._transform(self._graph, (curr, neigh)) == es.EdgeSign.NEGATIVE.value:
+                    self.__possible_component_edges.add((curr, neigh))
                     continue
                 
                 if neigh not in self.__visited:
@@ -61,12 +64,15 @@ class SignedNetworkComponentClusterer:
                     component.add_node(neigh)
                 
                 if not component.has_edge(curr, neigh):
-                    component.add_edge(curr, neigh, self._graph[curr][neigh])
+                    component.add_edges_from([(curr, neigh, self._graph[curr][neigh])])
 
-        self.__detect_negative_edges(begin_node, component)
+                # print(node_queue)
+
+        self.__detect_negative_edges(component)
 
         self.__components.append(component)
-        component.name = "COMP " + self.__components.index(component)
+        component.name = "COMP " + str(self.__components.index(component))
+        print(component)
 
 
     # Sakupimo sve negativne grane unutar komponente
@@ -79,7 +85,7 @@ class SignedNetworkComponentClusterer:
         
         for i in range(0, len(nodes) - 1):
             for j in range(i + 1, len(nodes)):
-                if self._graph.has_edge(nodes[i], nodes[j]) and self._transform(self._graph[nodes[i]][nodes[j]]) == EdgeSign.NEGATIVE:
+                if self._graph.has_edge(nodes[i], nodes[j]) and self._transform(component, (nodes[i], nodes[j])) == es.EdgeSign.NEGATIVE:
                     self.__negative_edges[component].append((nodes[i], nodes[j], self._graph[nodes[i]][nodes[j]])) 
 
 
@@ -105,7 +111,7 @@ class SignedNetworkComponentClusterer:
             if component1 == component2 or self.__cluster_graph.has_edge(component1, component2):
                 continue
 
-            self.__cluster_graph.add_edge(component1, component2, edge[2])
+            self.__cluster_graph.add_edge(component1, component2, sign='-')
 
     # ========= Kraj analize mreze ===========
 
