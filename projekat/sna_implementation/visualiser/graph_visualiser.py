@@ -38,8 +38,8 @@ def draw_graph(G: nx.Graph, transform, layout_key="spring", has_name=False):
     edge_colors = ['red' if transform(G, edge) == EdgeSign.NEGATIVE.value else 'green' for edge in G.edges()]
     nx.draw_networkx_edges(G, pos, edge_color=edge_colors)
     
-    edge_labels = {edge: transform(G, edge) for edge in G.edges()}
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+    # edge_labels = {edge: transform(G, edge) for edge in G.edges()}
+    # nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
     plt.subplots_adjust(left=0.1, bottom=0.12, top=0.9, right=0.95)
     plt.show()

@@ -92,6 +92,8 @@ class SignedNetworkComponentClusterer:
     # Konstruisemo graf od dobijenih komponenata
     def __create_cluster_graph(self):
         
+        self.__cluster_graph.add_nodes_from(self.__components)
+
         if not self.__possible_component_edges:
             return
         
@@ -101,12 +103,6 @@ class SignedNetworkComponentClusterer:
 
             component1 = [x for x in self.__components if x.has_node(node1)][0]
             component2 = [x for x in self.__components if x.has_node(node2)][0]
-
-            if component1 not in self.__cluster_graph:
-                self.__cluster_graph.add_node(component1)
-
-            if component2 not in self.__cluster_graph:
-                self.__cluster_graph.add_node(component2)
 
             if component1 == component2 or self.__cluster_graph.has_edge(component1, component2):
                 continue

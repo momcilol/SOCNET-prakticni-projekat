@@ -1,12 +1,6 @@
-from math import degrees
 import numpy as np
-from platform import node
-from queue import Empty
 import networkx as nx
-import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
-import sna_implementation.clustering.signed_clusterable_network as cl
-from sna_implementation.clustering.edge_sign import EdgeSign
 
 
 # Node metrics
@@ -28,11 +22,11 @@ def get_closeness_centrality(graph):
 
 
 def get_eigenvector_centrality(graph):
-    return nx.eigenvector_centrality(graph)
+    return nx.eigenvector_centrality(graph, tol=1.0e-4)
 
 
 def get_page_rank(graph: nx.DiGraph):
-    return nx.pagerank(graph)
+    return nx.pagerank(graph, tol=1.0e-4)
 
 
 def get_clustering_coefficients(graph):
@@ -101,7 +95,7 @@ def print_hits_results(results, has_name=False):
 def get_small_world_metric_results(graph: nx.Graph):
     G = list(graph.nodes())
 
-    if not nx.is_connected:
+    if not nx.is_connected(graph):
         largest_cc = max(nx.connected_components(graph), key=len)
         G = list(largest_cc)
 
@@ -110,32 +104,39 @@ def get_small_world_metric_results(graph: nx.Graph):
     small = 0
     eff = 0
 
+    min_ecc = n
+    max_dis = 0
+
     for a in G:
+        ecc = 0
+
         for b in G:
             if a != b:
-                tmp = nx.shortest_path_length(graph, a, b)
-                small += tmp
-                eff += 1/tmp
+                distance = nx.shortest_path_length(graph, a, b)
+                small += distance
+                eff += 1/distance
+                if distance > max_dis:
+                    max_dis = distance
+                if distance > ecc:
+                    ecc = distance
+                
+        if min_ecc > ecc:
+            min_ecc = ecc
 
     global_efficiency = 0
     for a in graph:
         for b in graph:
             if a!=b:
-                tmp = nx.shortest_path_length(graph, a, b)
-                if tmp != nx.NetworkXNoPath:
-                    global_efficiency += 1/tmp
+                try:
+                    tmp = nx.shortest_path_length(graph, a, b)
+                    global_efficiency += 1/tmp 
+                except nx.NetworkXNoPath:
+                    pass
 
     non = graph.number_of_nodes()            
  
-    return small/nn, eff/nn, global_efficiency/(non * (non - 1))
+    return small/nn, eff/nn, global_efficiency/(non * (non - 1)), max_dis, min_ecc
 
-
-def get_diameter(graph: nx.Graph):
-    return nx.diameter(graph)
-
-
-def get_radius(graph: nx.Graph):
-    return nx.radius(graph)
 
 # K-core decomposition
 

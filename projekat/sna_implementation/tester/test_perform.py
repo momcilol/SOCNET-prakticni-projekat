@@ -20,6 +20,7 @@ class Tester:
     def print_network(self):
         print(f"Input network: {self._sncc._graph}")
         self._print_nodes_and_edges(self._sncc._graph)
+        input(">>Print cultser network>>")
         print(f"Cluster network: {self._sncc.get_cluster_graph().number_of_nodes()} clusters")
         self._print_cluster_network()
 
@@ -52,6 +53,7 @@ class Tester:
             self._print_nodes_and_edges(cluster)
             print(f"Problematic edges: {len(self._sncc.get_problematic_edges(cluster))} edges")
             self._print_problematic_edges(cluster)
+            print()
 
         print()
         print(f"Number of trivial coalitions: {trivial}", end='\n\n')
@@ -101,6 +103,7 @@ class Tester:
         
         for i in range(len(metrics_results)):
             ma.print_node_metrics_results(metrics_results[i], ma.node_metrics[i], has_name)
+            input(">>next centrality>>")
         print(f"Average clustering coefficinet: {nx.average_clustering(graph) : .4f}", end="\n\n")
 
 
@@ -137,15 +140,15 @@ class Tester:
 
     
     def print_small_world_metrics(self, graph:  nx.Graph):
-        small_world, efficiency, global_efficiency = ma.get_small_world_metric_results(graph)
+        small_world, efficiency, global_efficiency, diameter, radius = ma.get_small_world_metric_results(graph)
         print(f"""
             SMALL WORLD METRICS
         """)
         print(f"Small world coefficient: {small_world : .4f}, log(number of nodes) = {log(float(graph.number_of_nodes()), 10) : .4f}")
         print(f"Giant component network efficiency: {efficiency : .4f}")
         print(f"Network efficiency: {global_efficiency: .4f}")
-        print(f"Diameter: {ma.get_diameter(graph)}")
-        print(f"Radius: {ma.get_radius(graph)}")
+        print(f"Diameter: {diameter}")
+        print(f"Radius: {radius}")
     
     
     def draw_network(self, graph: nx.Graph, layout="spring", name=False):
