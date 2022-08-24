@@ -40,6 +40,18 @@ def draw_degree_info(results: list, metric):
     plt.show()
 
 
+def draw_degree_info_log(results: list, metric):
+    plt.style.use('_mpl-gallery')
+    fig, ax = plt.subplots()
+
+
+    ax.bar(list(range(len(results))), results, linewidth=2.0, log= True)
+    plt.xlabel('Degree')
+    plt.title(degree_info_metric[metric])
+    plt.subplots_adjust(left=0.1, bottom=0.12, top=0.9, right=0.95)
+    plt.show()
+
+
 def draw_assortativity(graph: nx.Graph, rang=False):
     xy = nx.node_degree_xy(graph)
     x, y = zip(*xy)

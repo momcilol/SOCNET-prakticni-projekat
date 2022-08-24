@@ -85,9 +85,9 @@ class Tester:
     def show_degree_information(self, graph: nx.Graph):
         print("DEGREE INFO")
         nodes_per_degree, degree_distribution, complementary_cumulative_distribution, average_degree, network_density = ma.get_degree_information(graph)
-        mv.draw_degree_info(nodes_per_degree, "ND")
-        mv.draw_degree_info(degree_distribution, "DD")
-        mv.draw_degree_info(complementary_cumulative_distribution, "CC")
+        mv.draw_degree_info_log(nodes_per_degree, "ND")
+        mv.draw_degree_info_log(degree_distribution, "DD")
+        mv.draw_degree_info_log(complementary_cumulative_distribution, "CC")
         print(f"Average degree: {average_degree : .4f}")
         dense = "dense" if network_density > 0.7 else "sparse"
         print(f"Network density: {network_density : .4f} (network is {dense})", end="\n\n")
