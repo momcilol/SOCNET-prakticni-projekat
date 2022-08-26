@@ -1,39 +1,44 @@
+from math import e, sqrt
 import networkx as nx
 import random as rn
 
 
-def get_erdos_renyi_model(n = 250, p = 0.05, seed = 12345, p_sign = 0.5):
+def get_erdos_renyi_model(n=250, p=0.05, seed=12345, p_sign=0.5):
     graph = nx.erdos_renyi_graph(n, p, seed)
 
     return add_signs(graph, p_sign, seed)
 
 
-def get_configuration_model(n = 250, max_deg = 40, seed = 12345, p_sign = 0.5):
+def get_configuration_model(n=250, max_deg=40, seed=12345, p_sign=0.5):
     rn.seed(seed)
-    degrees = [rn.randint(0,max_deg) for i in range(250)]
+    degrees = [rn.randint(0, max_deg) for i in range(250)]
     degrees[0] = degrees[0] + 1 if sum(degrees) % 2 == 1 else degrees[0]
-    graph = nx.configuration_model(degrees, create_using=nx.Graph(),  seed=seed)
+    graph = nx.configuration_model(
+        degrees, create_using=nx.Graph(),  seed=seed)
 
     return add_signs(graph, p_sign, seed)
 
 
-def get_watts_strogatz_model(n = 250, k = 4, p = 0.05, seed = 12345, p_sign = 0.5):
+def get_watts_strogatz_model(n=250, k=4, p=0.05, seed=12345, p_sign=0.5):
     graph = nx.watts_strogatz_graph(n, k, p, seed)
     return add_signs(graph, p_sign, seed)
 
 
-def get_barabasi_albert_model(n = 250, m0 = 50, m = 5, seed = 12345, p_sign = 0.5):
-    graph = nx.barabasi_albert_graph(n, m, seed, nx.erdos_renyi_graph(m0, 0.1, seed))
+def get_barabasi_albert_model(n=250, m0=50, m=5, seed=12345, p_sign=0.5):
+    graph = nx.barabasi_albert_graph(
+        n, m, seed, nx.erdos_renyi_graph(m0, 0.1, seed))
     return add_signs(graph, p_sign, seed)
 
 
-def get_barabasi_albert_extra_model(n = 250, m = 10, p = 0.33, q = 0.33, seed=12345, p_sign = 0.5):
+def get_barabasi_albert_extra_model(n=250, m=10, p=0.33, q=0.33, seed=12345, p_sign=0.5):
     graph = nx.extended_barabasi_albert_graph(n, m, p, q, seed)
     return add_signs(graph, p_sign, seed)
 
 
-def get_full_barabasi_albert_model(n = 500, n_s = 50, p_s = 0.04, m = 20, a = 25, p_c = 0.2, cap = 100, time_lim = 20, seed=12345, p_sign = 0.03):
+def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=20, a=25, p_c=0.35, cap=50, time_lim=150, seed=12345, p_sign=0.5):
     graph = nx.erdos_renyi_graph(n_s, p_s, seed)
+    graph = add_signs(graph, p_sign, seed)
+    # graph: nx.Graph
 
     rn.seed(seed)
     degs = []
@@ -44,7 +49,7 @@ def get_full_barabasi_albert_model(n = 500, n_s = 50, p_s = 0.04, m = 20, a = 25
         for _ in range(graph.degree(node) + a):
             degs.append(node)
             times[node] = 0
-    
+
     # Ubacujemo novi cvor
     for node in range(n_s, n):
         graph.add_node(node)
@@ -54,19 +59,25 @@ def get_full_barabasi_albert_model(n = 500, n_s = 50, p_s = 0.04, m = 20, a = 25
         for _ in range(m):
             index = rn.randint(0, len(degs) - 1)
             old = degs[index]
-            graph.add_edge(node, old)
+            sign = '+' if rn.random() < p_sign else '-'
+            graph.add_edges_from([(node, old, {'sign': sign})])
             # print(f"\tAdded edge: {(node, old)}")
             update_trackers(graph, old, degs, times, cap)
 
             # Dodajemo grane sa susedima old cvora
             for neigh in graph.neighbors(old):
                 if rn.random() < p_c and neigh in degs:
-                    graph.add_edge(node, neigh)
+                    if graph[old][neigh]['sign'] == '+':
+                        new_edge_sign = '+' if rn.random() < sqrt(p_sign) else '-'
+                    else:
+                        new_edge_sign = '+' if rn.random() < p_sign ** 2 else '-'
+                    graph.add_edges_from(
+                        [(node, neigh, {'sign': new_edge_sign})])
                     # print(f"\t\tAdded neighbour edge {(node, neigh)}")
                     update_trackers(graph, neigh, degs, times, cap)
-        
+
         # Azuriramo vremena i izbacimo sve one koji su prekoracili
-        times = {k : v + 1 for k, v in times.items() if v + 1 < time_lim}
+        times = {k: v + 1 for k, v in times.items() if v + 1 < time_lim}
         print(f"Times: {times}")
         # Ako su izbaceni iz times, izbacujemo ih i iz degs
         degs = [k for k in degs if k in times]
@@ -77,22 +88,58 @@ def get_full_barabasi_albert_model(n = 500, n_s = 50, p_s = 0.04, m = 20, a = 25
         for _ in range(graph.degree(node) + a):
             degs.append(node)
             times[node] = 0
-    
 
-    return add_signs(graph, p_sign, seed)
+    return graph
+
+    # return add_signs(graph, p_sign, seed)
 
 
 # Izbacujemo sve one koji imaju stepen >= cap
 def update_trackers(graph, node, degs, times, cap):
     if graph.degree(node) >= cap:
         degs = [n for n in degs if n != node]
-        try:    
+        try:
             times.pop(node)
-        except KeyError: 
+        except KeyError:
             print(f"No such key: {node}")
     else:
         degs.append(node)
-     
+
+
+def get_planted_partition_model(n=250, z=0.5, p=0.1, q=0.02, seed=12345):
+    m = [z, 1.0-z]
+
+    B = [
+        [p, q],
+        [q, p]
+    ]
+    return get_stochastic_block_model(n, 2, m, B, seed)
+
+
+def get_stochastic_block_model(n=250, q=10, m=None, B=None, seed=12345, p_sign=0.5):
+    rn.seed(seed)
+    if m is None:
+        m = [rn.random() for _ in range(q-1)]
+        m.append(1.0)
+        m.append(0.0)
+        m.sort(reverse=True)
+        m = [m[i] - m[i+1] for i in range(q)]
+    
+    sizes = [int(m[i]*n) for i in range(q)]
+    sizes[sizes.index(min(sizes))] += n - sum(sizes)
+
+    if B is None:
+        B = [[0 for _ in range(q)] for _ in range(q)]
+        for i in range(q):
+            for j in range(i, q):
+                if i == j:
+                    B[i][j] = 0.05 * (1 + rn.random())
+                else:
+                    B[i][j] = 0.05 * (1 + rn.random()) / q
+                    B[j][i] = B[i][j]
+
+    return add_signs(nx.stochastic_block_model(sizes, B, seed=seed), p_sign, seed)
+
 
 # Dodajemo znakove na linkove
 def add_signs(graph, p_sign, seed):
@@ -100,7 +147,7 @@ def add_signs(graph, p_sign, seed):
     for edge in graph.edges.data():
         edge[2]['sign'] = '+' if rn.random() <= p_sign else '-'
         # print(edge)
-    
+
     return graph
 
 # get_erdos_renyi_model()
