@@ -78,11 +78,11 @@ def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=20, a=25, p_c=0.35
 
         # Azuriramo vremena i izbacimo sve one koji su prekoracili
         times = {k: v + 1 for k, v in times.items() if v + 1 < time_lim}
-        print(f"Times: {times}")
+        # print(f"Times: {times}")
         # Ako su izbaceni iz times, izbacujemo ih i iz degs
         degs = [k for k in degs if k in times]
-        print(f"Degrees: {degs}")
-        print("Trackers updated")
+        # print(f"Degrees: {degs}")
+        # print("Trackers updated")
 
         # Dodajemo novi cvor u degs i times
         for _ in range(graph.degree(node) + a):

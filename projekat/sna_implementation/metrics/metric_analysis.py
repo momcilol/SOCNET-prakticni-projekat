@@ -1,3 +1,5 @@
+from locale import normalize
+from math import sqrt
 import numpy as np
 import networkx as nx
 from scipy.stats import spearmanr
@@ -14,7 +16,7 @@ node_metrics = [
 
 
 def get_betweeness_centrality(graph):
-    return nx.betweenness_centrality(graph)
+    return nx.betweenness_centrality(graph, normalized=True)
 
 
 def get_closeness_centrality(graph):
@@ -22,11 +24,11 @@ def get_closeness_centrality(graph):
 
 
 def get_eigenvector_centrality(graph):
-    return nx.eigenvector_centrality(graph, tol=1.0e-4)
+    return nx.eigenvector_centrality(graph, tol=1.0e-3)
 
 
 def get_page_rank(graph: nx.DiGraph):
-    return nx.pagerank(graph, tol=1.0e-4)
+    return nx.pagerank(graph, tol=1.0e-3)
 
 
 def get_clustering_coefficients(graph):
@@ -55,16 +57,16 @@ def get_adamic_adar_coefficients(graph: nx.Graph):
 
 def print_node_metrics_results(results, metric, has_name=False):
     print(f"""
-       {metric.upper()}
+                    {metric.upper()}
 
-        NODES  |  SCORES 
+                    NODES  |  SCORES 
     """)
     if has_name:
         for node, score in results.items():
-            print(f"{node.name : >13}  | {score : .4f}")
+            print(f"{node.name : >25}  | {score : .4f}")
     else:
         for node, score in results.items():
-            print(f"{node : >13}  | {score : .4f}")
+            print(f"{node : >25}  | {score : .4f}")
     print()
 
 
@@ -76,16 +78,16 @@ def get_hits_results(graph: nx.DiGraph):
 def print_hits_results(results, has_name=False):
     hubs, authorities = results
     print(f"""
-        HITS
+                    HITS
 
-        NODES  |     HUBS     |  AUTHORITIES
+                    NODES  |     HUBS     |  AUTHORITIES
     """)
     if has_name:
         for (k, v), (k1, v1) in zip(hubs.items(), authorities.items()):
-            print(f"{k.name : >10} | {v : 12.4f} | {v1 : 12.4f}")
+            print(f"{k.name : >25}  | {v : 12.4f} | {v1 : 12.4f}")
     else:
         for (k, v), (k1, v1) in zip(hubs.items(), authorities.items()):
-            print(f"{k : >10} | {v : 12.4f} | {v1 : 12.4f}")
+            print(f"{k : >25} | {v : 12.4f} | {v1 : 12.4f}")
     print()
 
 
