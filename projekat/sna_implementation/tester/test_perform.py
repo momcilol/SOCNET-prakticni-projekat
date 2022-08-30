@@ -71,11 +71,20 @@ class Tester:
 
 
     def check_clusterability(self):
-        print("CLUSTERABILITY")
-        clusterable = len(self._sncc.get_non_coalitions()) > 0
-        clust = "not " if clusterable else ""
+        print("CLUSTERABILITY & BALANCE")
+
+        clusterable = not len(self._sncc.get_non_coalitions()) > 0
+        balanced = clusterable and self._sncc.check_stuctural_balance()
+        if not clusterable:
+            clust = "not clusterable"
+        elif clusterable and not balanced:
+            clust = "clusterable and not balanced"
+        else:
+            clust = "balanced" 
         details = f": {len(self._sncc.get_non_coalitions())} clusters with {len(self._sncc.get_negative_edges())} problematic edges"
-        print(f"Network is {clust}culsterable {details if clusterable else ''}") 
+        print(f"Network is {clust} {'' if clusterable else details}") 
+
+        # Print coalitions and components
         num_coalitions = len(self._sncc.get_coalitions())
         num_components = len(self._sncc.get_components()) 
         num_trivial = len([x for x in self._sncc.get_coalitions() if x.number_of_nodes() == 1])

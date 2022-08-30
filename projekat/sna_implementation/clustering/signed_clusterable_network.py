@@ -1,3 +1,4 @@
+from platform import node
 import networkx as nx
 import sna_implementation.clustering.edge_sign as es
 import itertools
@@ -109,6 +110,40 @@ class SignedNetworkComponentClusterer:
 
             self.__cluster_graph.add_edges_from([(component1, component2, self._graph[node1][node2])])
             # self.__cluster_graph.add_edge(component1, component2, sign='-')
+
+
+    def check_stuctural_balance(self):
+
+        node_list = list(self.__cluster_graph.nodes())
+
+        # Iteriramo po svim parovima komponenti
+        for i in range(len(node_list)-1):
+            for j in range(i+1, len(node_list)):
+
+                # Proveravamo da li postoji put, ako ne, nastavljamo dalje
+                if not nx.has_path(self.__cluster_graph, node_list[i], node_list[j]):
+                    continue
+
+                # Za sve puteve proveravamo da li su istog znaka
+                paths = nx.all_simple_edge_paths(self.__cluster_graph, node_list[i], node_list[j])
+                path_signs = []
+
+                # Prebrojimo negativne grane na putu, i ostavimo parnost
+                for path in paths:
+                    path_signs.append(0)
+                    for edge in path:
+                        path_signs[-1] += 1 if self._transform(self.__cluster_graph, edge) == es.EdgeSign.NEGATIVE.value else 0
+                    path_signs[-1] = path_signs[-1] % 2
+                
+                # Proverimo da li su svi putevi iste parnosti, ako makar jedan ne valja, vracamo False
+                parity = path_signs[0]
+                for k in range(1, len(path_signs)):
+                    if path_signs[k] != parity:
+                        return False
+
+        # Ako je sve proslo, znaci dobro je        
+        return True                      
+
 
     # ========= Kraj analize mreze ===========
 
