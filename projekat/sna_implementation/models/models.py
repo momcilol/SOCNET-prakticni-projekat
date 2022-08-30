@@ -18,14 +18,13 @@ def get_configuration_model(n=250, max_deg=40, seed=12345, p_sign=0.5):
     return add_signs(graph, p_sign, seed)
 
 
-def get_watts_strogatz_model(n=250, k=4, p=0.05, seed=12345, p_sign=0.5):
+def get_watts_strogatz_model(n=250, k=10, p=0.1, seed=12345, p_sign=0.5):
     graph = nx.watts_strogatz_graph(n, k, p, seed)
     return add_signs(graph, p_sign, seed)
 
 
 def get_barabasi_albert_model(n=250, m0=50, m=5, seed=12345, p_sign=0.5):
-    graph = nx.barabasi_albert_graph(
-        n, m, seed, nx.erdos_renyi_graph(m0, 0.1, seed))
+    graph = nx.barabasi_albert_graph(n, m, seed, nx.erdos_renyi_graph(m0, 0.1, seed))
     return add_signs(graph, p_sign, seed)
 
 
