@@ -13,8 +13,7 @@ def get_configuration_model(n=250, max_deg=40, seed=12345, p_sign=0.5):
     rn.seed(seed)
     degrees = [rn.randint(0, max_deg) for i in range(250)]
     degrees[0] = degrees[0] + 1 if sum(degrees) % 2 == 1 else degrees[0]
-    graph = nx.configuration_model(
-        degrees, create_using=nx.Graph(),  seed=seed)
+    graph = nx.configuration_model(degrees, create_using=nx.Graph(),  seed=seed)
 
     return add_signs(graph, p_sign, seed)
 
