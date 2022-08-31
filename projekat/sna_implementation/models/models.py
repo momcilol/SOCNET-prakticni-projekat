@@ -1,4 +1,5 @@
 from math import e, sqrt
+from zoneinfo import available_timezones
 import networkx as nx
 import random as rn
 
@@ -33,10 +34,10 @@ def get_barabasi_albert_extra_model(n=250, m=10, p=0.33, q=0.33, seed=12345, p_s
     return add_signs(graph, p_sign, seed)
 
 
-def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=5, a=25, p_c=0.45, cap=50, time_lim=150, seed=12345, p_sign=0.5):
+def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=10, a=15, p_c=0.75, cap=50, time_lim=150, seed=12345, p_sign=0.5):
     graph = nx.erdos_renyi_graph(n_s, p_s, seed)
     graph = add_signs(graph, p_sign, seed)
-    # graph: nx.Graph
+    graph: nx.Graph
 
     rn.seed(seed)
     degs = []
@@ -53,26 +54,35 @@ def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=5, a=25, p_c=0.45,
         graph.add_node(node)
         # print(f"Added node {node}")
 
+        # Biramo prototip
+        prototype = rn.choice(degs)
+        sign = '+' if rn.random() < p_sign else '-'
+        graph.add_edges_from([(node, prototype, {'sign': sign})])
+        # print(f"\tAdded edge: {(node, prototype)}")
+        update_trackers(graph, prototype, degs, times, cap)
+        
+        neighbours = [n for n in graph.neighbors(prototype) if n in degs]
         # Dodajemo m novih grana
         for _ in range(m):
-            index = rn.randint(0, len(degs) - 1)
-            old = degs[index]
-            sign = '+' if rn.random() < p_sign else '-'
-            graph.add_edges_from([(node, old, {'sign': sign})])
-            # print(f"\tAdded edge: {(node, old)}")
-            update_trackers(graph, old, degs, times, cap)
+            # Dodajemo grane sa susedima protorype cvora
+            if rn.random() < p_c and len(neighbours) > 0:
+                neigh = rn.choice(neighbours)
+                # Biramo znak grane
+                if graph[prototype][neigh]['sign'] == sign:
+                    new_edge_sign = '+' if rn.random() < sqrt(p_sign) else '-'
+                else:
+                    new_edge_sign = '+' if rn.random() < p_sign ** 2 else '-'
 
-            # Dodajemo grane sa susedima old cvora
-            for neigh in graph.neighbors(old):
-                if rn.random() < p_c and neigh in degs:
-                    if graph[old][neigh]['sign'] == sign:
-                        new_edge_sign = '+' if rn.random() < sqrt(p_sign) else '-'
-                    else:
-                        new_edge_sign = '+' if rn.random() < p_sign ** 2 else '-'
-                    graph.add_edges_from(
-                        [(node, neigh, {'sign': new_edge_sign})])
-                    # print(f"\t\tAdded neighbour edge {(node, neigh)}")
-                    update_trackers(graph, neigh, degs, times, cap)
+                graph.add_edges_from([(node, neigh, {'sign': new_edge_sign})])
+                # print(f"\t\tAdded neighbour edge {(node, neigh)}")
+                update_trackers(graph, neigh, degs, times, cap)
+            else:
+                rannode = rn.choice(degs)
+                new_edge_sign = '+' if rn.random() < p_sign else '-'
+                graph.add_edges_from([(node, rannode, {'sign': new_edge_sign})])
+                # print(f"\tAdded edge: {(node, old)}")
+                update_trackers(graph, rannode, degs, times, cap)
+
 
         # Azuriramo vremena i izbacimo sve one koji su prekoracili
         times = {k: v + 1 for k, v in times.items() if v + 1 < time_lim}
@@ -104,7 +114,7 @@ def update_trackers(graph, node, degs, times, cap):
         degs.append(node)
 
 
-def get_planted_partition_model(n=250, z=0.5, p=0.1, q=0.02, seed=12345):
+def get_planted_partition_model(n=250, z=0.5, p=0.07, q=0.01, seed=12345):
     m = [z, 1.0-z]
 
     B = [
