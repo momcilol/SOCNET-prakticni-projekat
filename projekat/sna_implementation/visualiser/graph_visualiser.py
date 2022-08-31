@@ -18,7 +18,7 @@ def draw_graph(G: nx.Graph, transform, layout_key="spring", has_name=False):
     pos = layout[layout_key](G)
     max_deg = max([v for k, v in list(G.degree())]) + 1
     node_color = [1-log(float(0.6*max_deg + 0.6*(G.degree(node)+1)), 2*max_deg) for node in G.nodes()]
-    node_size = [(2-x)*170 for x in node_color]
+    node_size = [(1-x)*400 for x in node_color]
     # print(node_color)
     node_lables = {}
     if has_name:

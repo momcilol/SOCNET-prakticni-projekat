@@ -26,8 +26,8 @@ class Tester:
 
 
     def _print_nodes_and_edges(self, graph: nx.Graph):
-        print(f"    Nodes: {list(graph.nodes())}")
-        print(f"    Edges: {list(graph.edges())}", end='\n\n')
+        print(f"    Nodes: {list(graph.nodes())} \n    Total: {graph.number_of_nodes()}")
+        print(f"    Edges: {list(graph.edges())} \n    Total: {graph.number_of_edges()}", end='\n\n')
 
 
     def _print_cluster_network(self):
@@ -62,6 +62,7 @@ class Tester:
         for edge in cluster_graph.edges():
             print(f"{edge[0].name} (-) {edge[1].name}", end=", ")
         print()
+        print(f"Total: {cluster_graph.number_of_edges()} edges")
         
 
     
@@ -153,6 +154,7 @@ class Tester:
         for i in range(len(layers)):
             print(f"    Shell {i} size: {len(layers[i])}")
         print()
+        mv.draw_degree_info_log([len(layers[i]) for i in range(len(layers))], "KC")
 
     
     def print_small_world_metrics(self, graph:  nx.Graph):

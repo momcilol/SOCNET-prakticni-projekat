@@ -24,7 +24,8 @@ def draw_centrality_results(results: dict, metric, has_name=False):
 degree_info_metric = {
     "ND": "Nodes per degree",
     "DD": "Degree distribution",
-    "CC": "Complementary cumulative degree distribution"
+    "CC": "Complementary cumulative degree distribution",
+    "KC": "K-core decomposition"
 }
 
 
