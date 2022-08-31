@@ -34,7 +34,7 @@ def get_barabasi_albert_extra_model(n=250, m=10, p=0.33, q=0.33, seed=12345, p_s
     return add_signs(graph, p_sign, seed)
 
 
-def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=10, a=5, p_c=0.75, cap=50, time_lim=150, seed=12345, p_sign=0.5):
+def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=10, a=15, p_c=0.75, cap=50, time_lim=150, seed=12345, p_sign=0.5):
     graph = nx.erdos_renyi_graph(n_s, p_s, seed)
     graph = add_signs(graph, p_sign, seed)
     graph: nx.Graph
@@ -64,7 +64,7 @@ def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=10, a=5, p_c=0.75,
         neighbours = [n for n in graph.neighbors(prototype) if n in degs]
         # Dodajemo m novih grana
         for _ in range(m):
-            # Dodajemo grane sa susedima protorype cvora
+            # Dodajemo grane sa susedima prototype cvora
             if rn.random() < p_c and len(neighbours) > 0:
                 neigh = rn.choice(neighbours)
                 # Biramo znak grane
