@@ -64,6 +64,7 @@ def draw_degree_info_loglog(results: list, metric):
     
     if len(results) > 50:
         ax.set_xscale('log')
+        ax.set_yscale('log')
     
     plt.xlabel('Degree')
     plt.title(degree_info_metric[metric])
