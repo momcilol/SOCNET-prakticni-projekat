@@ -33,7 +33,7 @@ def get_barabasi_albert_extra_model(n=250, m=10, p=0.33, q=0.33, seed=12345, p_s
     return add_signs(graph, p_sign, seed)
 
 
-def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=20, a=25, p_c=0.35, cap=50, time_lim=150, seed=12345, p_sign=0.5):
+def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=5, a=25, p_c=0.45, cap=50, time_lim=150, seed=12345, p_sign=0.5):
     graph = nx.erdos_renyi_graph(n_s, p_s, seed)
     graph = add_signs(graph, p_sign, seed)
     # graph: nx.Graph
@@ -65,7 +65,7 @@ def get_full_barabasi_albert_model(n=250, n_s=50, p_s=0.04, m=20, a=25, p_c=0.35
             # Dodajemo grane sa susedima old cvora
             for neigh in graph.neighbors(old):
                 if rn.random() < p_c and neigh in degs:
-                    if graph[old][neigh]['sign'] == '+':
+                    if graph[old][neigh]['sign'] == sign:
                         new_edge_sign = '+' if rn.random() < sqrt(p_sign) else '-'
                     else:
                         new_edge_sign = '+' if rn.random() < p_sign ** 2 else '-'
