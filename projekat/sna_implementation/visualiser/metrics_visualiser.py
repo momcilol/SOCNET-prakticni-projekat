@@ -55,11 +55,15 @@ def draw_degree_info_loglog(results: list, metric):
     plt.style.use('_mpl-gallery')
     fig, ax = plt.subplots()
 
-   
 
     ax.scatter(list(range(len(results))), results)
-    ax.set_yscale('log')
-    ax.set_xscale('log')
+    
+    if max(results) > 10*(min(results) + 1):
+        ax.set_yscale('log')
+    
+    if len(results) > 50:
+        ax.set_xscale('log')
+    
     plt.xlabel('Degree')
     plt.title(degree_info_metric[metric])
     plt.subplots_adjust(left=0.1, bottom=0.12, top=0.9, right=0.95)
@@ -74,6 +78,12 @@ def draw_assortativity(graph: nx.Graph, rang=False):
     fig, ax = plt.subplots()
 
     ax.scatter(x, y)
+
+    if max(y) > 10*(min(y) + 1):
+        ax.set_yscale('log')
+        ax.set_xscale('log')
+
+
     plt.title("Assortativity")
     plt.xlabel('Node degrees')
     plt.ylabel('Node degrees')

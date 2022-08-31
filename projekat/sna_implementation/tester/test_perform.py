@@ -18,16 +18,16 @@ class Tester:
 
 
     def print_network(self):
-        print(f"Input network: {self._sncc._graph}")
+        print(f"    Input network: {self._sncc._graph}")
         self._print_nodes_and_edges(self._sncc._graph)
         input(">>Print cultser network>>")
-        print(f"Cluster network: {self._sncc.get_cluster_graph().number_of_nodes()} clusters")
+        print(f"    Cluster network: {self._sncc.get_cluster_graph().number_of_nodes()} clusters")
         self._print_cluster_network()
 
 
     def _print_nodes_and_edges(self, graph: nx.Graph):
-        print(f"Nodes: {list(graph.nodes())}")
-        print(f"Edges: {list(graph.edges())}", end='\n\n')
+        print(f"    Nodes: {list(graph.nodes())}")
+        print(f"    Edges: {list(graph.edges())}", end='\n\n')
 
 
     def _print_cluster_network(self):
@@ -51,14 +51,14 @@ class Tester:
         for cluster in non_coalitions:
             print(f"{cluster.name} cluster")
             self._print_nodes_and_edges(cluster)
-            print(f"Problematic edges: {len(self._sncc.get_problematic_edges(cluster))} edges")
+            print(f"    Problematic edges: {len(self._sncc.get_problematic_edges(cluster))} edges")
             self._print_problematic_edges(cluster)
             print()
 
         print()
-        print(f"Number of trivial coalitions: {trivial}", end='\n\n')
+        print(f"    Number of trivial coalitions: {trivial}", end='\n\n')
         
-        print("Inter-component edges: ")
+        print("   Inter-component edges: ")
         for edge in cluster_graph.edges():
             print(f"{edge[0].name} (-) {edge[1].name}", end=", ")
         print()
@@ -71,7 +71,7 @@ class Tester:
 
 
     def check_clusterability(self):
-        print("CLUSTERABILITY & BALANCE")
+        print("     CLUSTERABILITY & BALANCE")
 
         clusterable = not len(self._sncc.get_non_coalitions()) > 0
         balanced = clusterable and self._sncc.check_stuctural_balance()
@@ -82,7 +82,7 @@ class Tester:
         else:
             clust = "balanced" 
         details = f": {len(self._sncc.get_non_coalitions())} clusters with {len(self._sncc.get_negative_edges())} problematic edges"
-        print(f"Network is {clust} {'' if clusterable else details}") 
+        print(f"    Network is {clust} {'' if clusterable else details}") 
 
         # Print coalitions and components
         num_coalitions = len(self._sncc.get_coalitions())
@@ -92,14 +92,14 @@ class Tester:
 
     
     def show_degree_information(self, graph: nx.Graph):
-        print("DEGREE INFO")
+        print("     DEGREE INFO")
         nodes_per_degree, degree_distribution, complementary_cumulative_distribution, average_degree, network_density = ma.get_degree_information(graph)
         mv.draw_degree_info_loglog(nodes_per_degree, "ND")
         mv.draw_degree_info_loglog(degree_distribution, "DD")
         mv.draw_degree_info_loglog(complementary_cumulative_distribution, "CC")
-        print(f"Average degree: {average_degree : .4f}")
+        print(f"    Average degree: {average_degree : .4f}")
         dense = "dense" if network_density > 0.7 else "sparse"
-        print(f"Network density: {network_density : .4f} (network is {dense})", end="\n\n")
+        print(f"    Network density: {network_density : .4f} (network is {dense})", end="\n\n")
 
 
     def print_centralities(self, graph: nx.Graph, has_name=False):
@@ -112,8 +112,11 @@ class Tester:
         
         for i in range(len(metrics_results)):
             ma.print_node_metrics_results(metrics_results[i], ma.node_metrics[i], has_name)
-            input(">>next centrality>>")
-        print(f"Average clustering coefficinet: {nx.average_clustering(graph) : .4f}", end="\n\n")
+            print(f"""
+            Max: {max(metrics_results[i].values()) : .4f}, 
+            Min: {min(metrics_results[i].values()) : .4f},
+            Average: {sum(metrics_results[i].values()) / float(len(metrics_results[i])) : .4f}""", end="\n\n")
+            input(">>next>>")
 
 
 
@@ -127,13 +130,13 @@ class Tester:
 
     def print_assortativity(self, graph: nx.Graph):
         mv.draw_assortativity(graph)
-        print(f"Pearson coefficient: {ma.get_pearson_coefficient(graph) : .4f}")
-        print(f"Spearman coefficient: {ma.get_spearman_coefficient(graph) : .4f}")
+        print(f"    Pearson coefficient: {ma.get_pearson_coefficient(graph) : .4f}")
+        print(f"    Spearman coefficient: {ma.get_spearman_coefficient(graph) : .4f}")
 
 
     def print_k_core_decomposition(self, graph: nx.Graph, has_name=False):
         k_core_decomposition = ma.get_k_core_decomposition(graph)
-        print(f"K-core decomposition: {graph.name}")
+        print(f"    K-core decomposition: {graph.name}")
         max_layer = max(k_core_decomposition.values())
         layers = {i: set() for i in range(max_layer + 1)}
         if has_name:
@@ -144,8 +147,11 @@ class Tester:
                 layers[value].add(node)
         
         for i in range(len(layers)):
-            print(f"Shell {i}: {layers[i]}")
-        
+            print(f"    Shell {i}: {layers[i]}")
+        print()
+
+        for i in range(len(layers)):
+            print(f"    Shell {i} size: {len(layers[i])}")
         print()
 
     
@@ -154,11 +160,11 @@ class Tester:
         print(f"""
             SMALL WORLD METRICS
         """)
-        print(f"Small world coefficient: {small_world : .4f}, log(number of nodes) = {log(float(graph.number_of_nodes()), 10) : .4f}")
-        print(f"Giant component network efficiency: {efficiency : .4f}")
-        print(f"Network efficiency: {global_efficiency: .4f}")
-        print(f"Diameter: {diameter}")
-        print(f"Radius: {radius}")
+        print(f"    Small world coefficient: {small_world : .4f}, log(number of nodes) = {log(float(graph.number_of_nodes()), 10) : .4f}")
+        print(f"    Giant component network efficiency: {efficiency : .4f}")
+        print(f"    Network efficiency: {global_efficiency: .4f}")
+        print(f"    Diameter: {diameter}")
+        print(f"    Radius: {radius}")
     
     
     def draw_network(self, graph: nx.Graph, layout="spring", name=False):
