@@ -79,7 +79,7 @@ def main():
         input(">>next>>")
         tester.print_similarity_matrix(cluster_network, True)
         input(">>next>>")
-        tester.draw_network(cluster_network, name=True) 
+        tester.draw_network(cluster_network, layout= "kamanda", name=True) 
     else:
         print("Cluster network has only one node. Nothing to analize...")
     input(">>Thats it>>")
