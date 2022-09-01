@@ -33,7 +33,7 @@ def choose_test(options: list):
             print(f"{i}: {options[i]}")
 
         try:
-            ans = int(input(">>"))
+            ans = int(input(">> "))
             if ans in range(len(options)):
                 break
             else:
